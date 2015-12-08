@@ -73,10 +73,7 @@ def main():
   if len(dirs) == 0:
     print "Please add at least one directory as an argument."
     exit()
-  if len(args.excludedDirs) == 0:
-    excludedDirs = []
-  else:
-    excludedDirs = args.excludedDirs.split(',')
+  excludedDirs = args.excludedDirs.split(',')
   filenames = getFileList(dirs[0], excludedDirs)
   errors = {}
   errors["violations"] = []
