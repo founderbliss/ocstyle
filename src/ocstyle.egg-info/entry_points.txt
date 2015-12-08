@@ -1,0 +1,3 @@
+[console_scripts]
+ocstyle = ocstyle.main:main
+
