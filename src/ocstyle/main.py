@@ -23,6 +23,7 @@ import parcon
 import fnmatch
 import os
 import pdb
+import json
 
 from ocstyle import rules
 
@@ -30,7 +31,7 @@ def isExcluded(base, testDir, excDirs):
   exc = False
   for excDir in excDirs:
     fullPathExc = base + excDir
-    if testDir == fullPathExc:
+    if fullPathExc in testDir:
       exc = True
       break
   return exc
@@ -40,7 +41,7 @@ def getFileList(base, excDirs):
   for root, dirnames, filenames in os.walk(base):
     if not isExcluded(base, root, excDirs):
       for filename in filenames:
-        if filename.endswith(('.m', '.h')):
+        if filename.endswith(('.m', '.mm', '.h')):
           matches.append(os.path.join(root, filename))
   return matches
 
@@ -69,6 +70,9 @@ def main():
   parser.add_argument("--maxLineLength", action="store", type=int, default=120, help="Maximum line length")
   parser.add_argument("--excludedDirs", action="store", default='/Core/Frameworks', help="Directores to exclude from linting")
   args, dirs = parser.parse_known_args()
+  if len(dirs) == 0:
+    print "Please add at least one directory as an argument."
+    exit()
   if len(args.excludedDirs) == 0:
     excludedDirs = []
   else:
@@ -78,13 +82,17 @@ def main():
   errors["violations"] = []
   for filename in filenames:
     if not os.path.isdir(filename):
-      print filename
+    #   print filename
       for part in check(filename, args.maxLineLength):
         if isinstance(part, rules.Error):
-          print 'ERROR: %s' % part
-        else:
-          print 'unparsed: %r' % part
-    print
+          errors["violations"].append({'file': filename,
+                                       'line': part.lineAndOffset()[0],
+                                       'type': part.kind,
+                                       'error': part.kind + " - " + part.message})
+        #   print 'ERROR: %s' % part
+        # else:
+        #   print 'unparsed: %r' % part
+  print json.dumps(errors, indent=4, separators=(',', ': '))
 
 
 if __name__ == '__main__':
