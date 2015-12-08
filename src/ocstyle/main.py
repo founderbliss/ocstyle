@@ -74,7 +74,6 @@ def main():
   else:
     excludedDirs = args.excludedDirs.split(',')
   filenames = getFileList(dirs[0], excludedDirs)
-  pdb.set_trace()
   errors = {}
   errors["violations"] = []
   for filename in filenames:
