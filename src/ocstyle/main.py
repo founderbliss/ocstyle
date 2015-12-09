@@ -51,7 +51,7 @@ def check(path, maxLineLength):
     return checkFile(path, f, maxLineLength)
 
 
-def remove_main_dir(mainDir, filepath):
+def removeMainDir(mainDir, filepath):
   if mainDir.endswith('/'):
     removePath = mainDir
   else:
@@ -88,17 +88,16 @@ def main():
   for filename in filenames:
     if not os.path.isdir(filename):
     #   print filename
-      for part in check(filename, args.maxLineLength):
-        if isinstance(part, rules.Error):
-          errors["violations"].append({'file': remove_main_dir(mainDir, filename),
+      try:
+        for part in check(filename, args.maxLineLength):
+          if isinstance(part, rules.Error):
+            errors["violations"].append({'file': removeMainDir(mainDir, filename),
                                        'line': part.lineAndOffset()[0],
                                        'type': part.kind,
                                        'error': part.kind + " - " + part.message})
-        #   print 'ERROR: %s' % part
-        # else:
-        #   print 'unparsed: %r' % part
+      except:
+        pass
   print json.dumps(errors, indent=4, separators=(',', ': '))
-
 
 if __name__ == '__main__':
   main()
