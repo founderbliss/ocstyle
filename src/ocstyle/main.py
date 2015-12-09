@@ -51,6 +51,13 @@ def check(path, maxLineLength):
     return checkFile(path, f, maxLineLength)
 
 
+def remove_main_dir(mainDir, filepath):
+  if mainDir.endswith('/'):
+    removePath = mainDir
+  else:
+    removePath = mainDir + '/'
+  return filepath.replace(removePath, '')
+
 def checkFile(path, f, maxLineLength):
   """Style checks the given file object."""
   content = f.read()
@@ -74,7 +81,8 @@ def main():
     print "Please add at least one directory as an argument."
     exit()
   excludedDirs = args.excludedDirs.split(',')
-  filenames = getFileList(dirs[0], excludedDirs)
+  mainDir = dirs[0]
+  filenames = getFileList(mainDir, excludedDirs)
   errors = {}
   errors["violations"] = []
   for filename in filenames:
@@ -82,7 +90,7 @@ def main():
     #   print filename
       for part in check(filename, args.maxLineLength):
         if isinstance(part, rules.Error):
-          errors["violations"].append({'file': filename,
+          errors["violations"].append({'file': remove_main_dir(mainDir, filename),
                                        'line': part.lineAndOffset()[0],
                                        'type': part.kind,
                                        'error': part.kind + " - " + part.message})
